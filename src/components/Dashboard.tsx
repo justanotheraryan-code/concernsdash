@@ -70,7 +70,7 @@ export default function Dashboard() {
   const [sessionsData, setSessionsData] = useState<Session[]>([]);
   const [ticketsData, setTicketsData] = useState<Ticket[]>([]);
   const [planData, setPlanData] = useState<CoursePlan[]>([]);
-  const [actions, setActions] = useState<DirectorActionItem[]>([]);
+  const [actions, setActions] = useState<DirectorActionItem[]>(() => getPersistedActions());
 
   const [program, setProgram] = useState<string>(PROGRAMS[0]);
   const [term, setTerm] = useState<string>(TERMS[2]);
@@ -91,10 +91,6 @@ export default function Dashboard() {
     if (hasClass) return true;
     return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
   });
-
-  useEffect(() => {
-    setActions(getPersistedActions());
-  }, []);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
@@ -208,9 +204,44 @@ export default function Dashboard() {
     };
   }, []);
 
-  useEffect(() => {
+  const resetVisibleCount = () => {
     setVisibleCount(dashboardConfig.SESSIONS_PER_CLICK);
-  }, [program, term, section, course, professor, range, query]);
+  };
+
+  const handleProgramChange = (value: string) => {
+    setProgram(value);
+    resetVisibleCount();
+  };
+
+  const handleTermChange = (value: string) => {
+    setTerm(value);
+    resetVisibleCount();
+  };
+
+  const handleSectionChange = (value: SectionFilter) => {
+    setSection(value);
+    resetVisibleCount();
+  };
+
+  const handleCourseChange = (value: string) => {
+    setCourse(value);
+    resetVisibleCount();
+  };
+
+  const handleProfessorChange = (value: string) => {
+    setProfessor(value);
+    resetVisibleCount();
+  };
+
+  const handleRangeChange = (value: (typeof RANGE)[number]["id"]) => {
+    setRange(value);
+    resetVisibleCount();
+  };
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    resetVisibleCount();
+  };
 
   const nowLabel = useMemo(() => {
     const dt = new Date();
@@ -433,7 +464,7 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-3 gap-2 md:flex md:items-center">
-            <Select value={program} onValueChange={setProgram}>
+            <Select value={program} onValueChange={handleProgramChange}>
               <SelectTrigger className="rounded-2xl">
                 <SelectValue placeholder="Program" />
               </SelectTrigger>
@@ -446,7 +477,7 @@ export default function Dashboard() {
               </SelectContent>
             </Select>
 
-            <Select value={term} onValueChange={setTerm}>
+            <Select value={term} onValueChange={handleTermChange}>
               <SelectTrigger className="rounded-2xl">
                 <SelectValue placeholder="Term" />
               </SelectTrigger>
@@ -483,7 +514,7 @@ export default function Dashboard() {
                   className="h-12 w-full rounded-2xl pl-12 text-[15px]"
                   placeholder="Search course, professor, topic, session ID..."
                   value={query}
-                  onChange={(e) => setQuery(e.target.value)}
+                  onChange={(e) => handleQueryChange(e.target.value)}
                 />
               </div>
             </div>
@@ -492,13 +523,13 @@ export default function Dashboard() {
 
         <FiltersPanel
           section={section}
-          setSection={setSection}
+          setSection={handleSectionChange}
           course={course}
-          setCourse={setCourse}
+          setCourse={handleCourseChange}
           professor={professor}
-          setProfessor={setProfessor}
+          setProfessor={handleProfessorChange}
           range={range}
-          setRange={setRange}
+          setRange={handleRangeChange}
           courses={courses}
           professors={professors}
           kpis={analytics.kpis}
