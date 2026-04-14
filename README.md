@@ -1,73 +1,131 @@
-# React + TypeScript + Vite
+# ConcernsDash
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+An **Academics Director Dashboard** for real-time monitoring and analytics of educational program delivery. Built for academic administrators to track course performance, student feedback, and operational issues across Post Graduate Programs (PGP).
 
-Currently, two official plugins are available:
+## Features
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **Session Tracking** — Monitor delivered sessions with ratings (1–5), attendance percentages, and student comments
+- **Ticket Management** — Track academic and operational issues by category (Schedule, Content, Faculty, Assessment, LMS, Operations) with priority levels and SLA monitoring
+- **Course & Faculty Health Scoring** — Automated weighted health scores with risk signals for courses and faculty
+- **Trend & Anomaly Detection** — Identifies rating drops, attendance crashes, backlog spikes, repeat faculty issues, and underperforming sections
+- **Risk Scoring Engine** — Configurable multi-factor weighted risk algorithm
+- **Leadership Insights** — Auto-generated actionable summaries for program directors
+- **Course Planning** — Track planned vs. delivered sessions across programs, terms, and sections
+- **CSV Bulk Import** — Upload session feedback, attendance, tickets, and course plan data from CSV files
+- **Dark Mode** — Toggle between light and dark themes (persisted in localStorage)
+- **Client-Side Persistence** — All custom data stored in browser localStorage; no backend required
 
-## React Compiler
+## Tech Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+| Layer | Technology |
+|---|---|
+| Framework | React 19 + TypeScript 5 |
+| Build Tool | Vite 7 |
+| Styling | Tailwind CSS 3 + shadcn/ui (Radix UI) |
+| Charts | Recharts |
+| CSV Parsing | PapaParse |
+| Icons | Lucide React |
+| Linting | ESLint 9 |
 
-## Expanding the ESLint configuration
+## Getting Started
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Prerequisites
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- Node.js 18+
+- npm
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+### Installation
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+git clone https://github.com/justanotheraryan-code/concernsdash.git
+cd concernsdash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+### Development
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm run dev
 ```
+
+Opens the app at `http://localhost:5173` with hot module replacement.
+
+### Production Build
+
+```bash
+npm run build
+npm run preview
+```
+
+## Project Structure
+
+```
+src/
+├── components/         # React UI components
+│   ├── ui/             # shadcn/ui base components
+│   ├── Dashboard.tsx   # Main dashboard (core layout & state)
+│   ├── Charts.tsx      # Recharts visualizations
+│   ├── FiltersPanel.tsx
+│   ├── InsightPanel.tsx
+│   ├── RiskPanel.tsx
+│   ├── SessionTable.tsx
+│   ├── TicketTable.tsx
+│   └── CourseMatrix.tsx
+├── lib/                # Core business logic
+│   ├── analyticsEngine.ts    # KPIs, risk scoring, health metrics
+│   ├── dataProvider.ts       # Data source abstraction layer
+│   ├── dataPersistence.ts    # localStorage read/write
+│   ├── insightGenerator.ts   # Leadership insight generation
+│   ├── anomalyDetection.ts   # Threshold-based anomaly flags
+│   └── trendCalculator.ts    # Linear regression / trend signals
+├── utils/              # Shared utility functions
+├── services/           # External integrations (CSV, API, Google Sheets)
+├── config/             # Dashboard constants and thresholds
+├── data/               # Mock/sample data (sessions, tickets, plans)
+└── types/              # TypeScript type definitions
+```
+
+## Data Sources
+
+Configure `DATA_SOURCE` in `src/config/dashboardConfig.ts`:
+
+| Source | Description |
+|---|---|
+| `mock` (default) | Pre-loaded sample data from `src/data/` |
+| `csv` | Upload CSVs directly in the dashboard UI |
+| `googleSheets` | Live sync from a Google Sheet (set `GOOGLE_SHEET_ID`) |
+| `api` | Fetch from a REST endpoint (set `API_BASE_URL`) |
+
+### CSV Format
+
+| CSV Type | Required Columns |
+|---|---|
+| Session Feedback | date, program, term, course, professor, section, topic, status, rating, responses, headcount, notes |
+| Attendance | date, course, professor, section, attendance%, headcount |
+| Tickets | created, resolved, program, term, status, priority, category, owner, title, description, slaHours, course, professor, section |
+| Course Plan | program, term, course, section, plannedSessions |
+
+## Configuration
+
+Key constants in `src/config/dashboardConfig.ts`:
+
+```ts
+PROGRAMS: ["PGP"]
+TERMS:    ["Term 1", "Term 2", "Term 3", "Term 4"]
+SECTIONS: ["All", "1", "2", "3", "4", "YLC"]
+
+// Risk score weights
+ratingDrop:     0.4
+attendanceDrop: 0.3
+ticketVolume:   0.2
+commentsSignal: 0.1
+```
+
+## Scripts
+
+| Command | Description |
+|---|---|
+| `npm run dev` | Start dev server |
+| `npm run build` | TypeScript compile + production bundle |
+| `npm run preview` | Preview the production build locally |
+| `npm run lint` | Run ESLint |
